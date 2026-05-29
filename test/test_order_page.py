@@ -5,7 +5,6 @@ from pages.main_page import MainPage
 from pages.order_page import OrderPage
 
 from data import (
-    BASE_URL,
     generate_order_data,
     generate_delivery_date,
 )
@@ -24,7 +23,8 @@ class TestOrderPage:
     def test_order(self, driver, order, station, delivery_date, rent_period, scooter_color):
         main_page = MainPage(driver)
         order_page = OrderPage(driver)        
-        driver.get(BASE_URL)
+
+        main_page.open_main_page()
 
         main_page.click_order_button_header()
         order_page.create_order(
@@ -34,7 +34,6 @@ class TestOrderPage:
             rent_period,
             scooter_color,
         )
-        assert "Заказ оформлен" in order_page.get_order_confirm_text()
-
+        
+        assert order_page.is_order_success_header_displayed()
         order_page.press_check_order_status_button()
-        order_page.click_logo_links()

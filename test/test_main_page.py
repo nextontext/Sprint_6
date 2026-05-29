@@ -2,28 +2,23 @@ import allure
 import pytest
 
 from pages.main_page import MainPage
-from data import BASE_URL
+from data import ACCORDION_ANSWERS, BASE_URL
 
 @allure.feature("Главная страница")
 class TestMainPage:
     @pytest.mark.parametrize(
         "index, accordion_tab_text",
         [
-            pytest.param(0, "Сутки — 400 рублей. Оплата курьеру — наличными или картой.", id="accordion_0"),
-            pytest.param(1, "Пока что у нас так: один заказ — один самокат. Если хотите покататься с друзьями, можете просто сделать несколько заказов — один за другим.", id="accordion_1"),
-            pytest.param(2, "Допустим, вы оформляете заказ на 8 мая. Мы привозим самокат 8 мая в течение дня. Отсчёт времени аренды начинается с момента, когда вы оплатите заказ курьеру. Если мы привезли самокат 8 мая в 20:30, суточная аренда закончится 9 мая в 20:30.", id="accordion_2"),
-            pytest.param(3, "Только начиная с завтрашнего дня. Но скоро станем расторопнее.", id="accordion_3"),
-            pytest.param(4, "Пока что нет! Но если что-то срочное — всегда можно позвонить в поддержку по красивому номеру 1010.", id="accordion_4"),
-            pytest.param(5, "Самокат приезжает к вам с полной зарядкой. Этого хватает на восемь суток — даже если будете кататься без передышек и во сне. Зарядка не понадобится.", id="accordion_5"),
-            pytest.param(6, "Да, пока самокат не привезли. Штрафа не будет, объяснительной записки тоже не попросим. Все же свои.", id="accordion_6"),
-            pytest.param(7, "Да, обязательно. Всем самокатов! И Москве, и Московской области.", id="accordion_7"),
+            pytest.param(index, text, id=f"accordion_{index}")
+            for index, text in ACCORDION_ANSWERS.items()
         ]
     )
     @allure.story("Аккордеон FAQ")
     @allure.tag("regression", "main page", "positive")
     def test_accordion_text(self, driver, index, accordion_tab_text):
         main_page = MainPage(driver)
-        driver.get(BASE_URL)
+        main_page.open_main_page()
+
 
         assert main_page.get_accordion_text_after_open(index) == accordion_tab_text
 
@@ -38,9 +33,35 @@ class TestMainPage:
     @allure.tag("regression", "main page", "positive")
     def test_order_buttons_open_order_page(self, driver, entry_point):
         main_page = MainPage(driver)
-        driver.get(BASE_URL)
+        main_page.open_main_page()
         main_page.close_cookie_banner_if_visible()
 
         main_page.click_order_button_by_entry_point(entry_point)
 
-        assert "/order" in driver.current_url
+        assert main_page.is_order_page_opened()
+
+    @allure.story("Переход по логотипу Самоката")
+    @allure.tag("regression", "main page", "positive")
+    def test_scooter_logo_opens_main_page(self, driver):
+        main_page = MainPage(driver)
+
+        main_page.open_main_page()
+        main_page.click_order_button_header()
+        main_page.click_scooter_logo()
+
+        assert main_page.get_current_url().rstrip("/") == BASE_URL.rstrip("/")
+    
+    @allure.story("Переход по логотипу Яндекса")
+    @allure.tag("regression", "main page", "positive")
+    def test_yandex_logo_opens_ya_page(self, driver):
+        main_page = MainPage(driver)
+
+        main_page.open_main_page()
+
+        old_window = main_page.get_current_window()
+        main_page.click_yandex_logo()
+        main_page.wait_number_of_windows_to_be(2)
+        main_page.switch_to_new_window(old_window)
+        main_page.wait_url_contains("ya.ru")
+
+        assert "ya.ru" in main_page.get_current_url()
