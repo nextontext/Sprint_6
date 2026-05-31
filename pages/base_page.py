@@ -2,6 +2,7 @@ import allure
 from locators.base_page_locators import BasePageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 class BasePage:
     def __init__(self, driver):
@@ -35,6 +36,15 @@ class BasePage:
                 self.driver.switch_to.window(window)
                 break
     
+    def is_url_contains(self, url_part, timeout=10):
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.url_contains(url_part)
+            )
+            return True
+        except TimeoutException:
+            return False
+
     def find_element(self, locator):
         return self.driver.find_element(*locator)
 

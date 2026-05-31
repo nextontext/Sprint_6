@@ -1,13 +1,13 @@
 import allure
 from pages.base_page import BasePage
 from locators.main_page_locators import MainPageLocators
-from data import BASE_URL
+from data import Urls
 
 
 class MainPage(BasePage):
     @allure.step("Открываем главную страницу")
     def open_main_page(self):
-        self.open_url(BASE_URL)
+        self.open_url(Urls.BASE_URL)
     
     @allure.step("Проверяем, что открылась страница заказа")
     def is_order_page_opened(self):
@@ -70,3 +70,4 @@ class MainPage(BasePage):
         self.click_order_status_button()
         self.set_order_number(order_number)
         self.click_go_to_search_button()
+    

@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from pages.main_page import MainPage
-from data import ACCORDION_ANSWERS, BASE_URL
+from data import Urls, AccordionTexts
 
 @allure.feature("Главная страница")
 class TestMainPage:
@@ -10,7 +10,7 @@ class TestMainPage:
         "index, accordion_tab_text",
         [
             pytest.param(index, text, id=f"accordion_{index}")
-            for index, text in ACCORDION_ANSWERS.items()
+            for index, text in AccordionTexts.ANSWERS.items()
         ]
     )
     @allure.story("Аккордеон FAQ")
@@ -18,7 +18,6 @@ class TestMainPage:
     def test_accordion_text(self, driver, index, accordion_tab_text):
         main_page = MainPage(driver)
         main_page.open_main_page()
-
 
         assert main_page.get_accordion_text_after_open(index) == accordion_tab_text
 
@@ -49,7 +48,7 @@ class TestMainPage:
         main_page.click_order_button_header()
         main_page.click_scooter_logo()
 
-        assert main_page.get_current_url().rstrip("/") == BASE_URL.rstrip("/")
+        assert main_page.get_current_url().rstrip("/") == Urls.BASE_URL.rstrip("/")
     
     @allure.story("Переход по логотипу Яндекса")
     @allure.tag("regression", "main page", "positive")
@@ -62,6 +61,5 @@ class TestMainPage:
         main_page.click_yandex_logo()
         main_page.wait_number_of_windows_to_be(2)
         main_page.switch_to_new_window(old_window)
-        main_page.wait_url_contains("ya.ru")
 
-        assert "ya.ru" in main_page.get_current_url()
+        assert main_page.is_url_contains("ya.ru")

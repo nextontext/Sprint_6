@@ -1,7 +1,6 @@
 import allure
 from pages.base_page import BasePage
 from selenium.webdriver.common.keys import Keys
-from data import BASE_URL
 from locators.order_page_locators import OrderPageLocators
 
 
@@ -88,18 +87,3 @@ class OrderPage(BasePage):
         self.fill_rent_form(delivery_date, rent_period, scooter_color, order["comment"])
         self.press_order_button()
         self.press_yes_button()
-
-    @allure.step("Проходим по ссылкам в логотипах")
-    def click_logo_links(self):
-        self.click_scooter_logo()
-        assert self.get_current_url().rstrip("/") == BASE_URL.rstrip("/")
-
-        old_window = self.get_current_window()
-
-        self.click_yandex_logo()
-
-        self.wait_number_of_windows_to_be(2)
-        self.switch_to_new_window(old_window)
-        self.wait_url_contains("ya.ru")
-
-        assert "ya" in self.get_current_url()
